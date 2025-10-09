@@ -1,22 +1,27 @@
 namespace BookModel
 {
-    public class Table : IBookElement
-    {
-        public string Title { get; set; }
+	public class Table : IBookElement
+	{
+		public string Name { get; set; }
 
-        public Table(string title)
-        {
-            Title = title;
-        }
+		public Table(string name)
+		{
+			Name = name;
+		}
 
-        public void Print()
-        {
-            Console.WriteLine($"Tabel: {Title}");
-        }
+		public void Print()
+		{
+			Console.WriteLine($"Table: {Name}");
+		}
 
-        public override string ToString()
-        {
-            return $"Tabel: {Title}";
-        }
-    }
+		// Leaf: no-op composite methods
+		public void Add(IBookElement element) { }
+		public void Remove(IBookElement element) { }
+		public IBookElement Get(int index) { return null; }
+
+		public override string ToString()
+		{
+			return $"Table: {Name}";
+		}
+	}
 }

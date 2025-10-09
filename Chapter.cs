@@ -2,50 +2,44 @@ using System.Collections.Generic;
 
 namespace BookModel
 {
-    /// <summary>
-    /// Clasa Chapter reprezintă un capitol care poate conține subcapitole
-    /// Implementează pattern-ul Composite
-    /// </summary>
-    public class Chapter : IBookElement
-    {
-        public string Name { get; set; }
-        private List<SubChapter> _subChapters;
+	public class Section : IBookElement
+	{
+		public string Title { get; set; }
+		private List<IBookElement> _children;
 
-        public Chapter(string name)
-        {
-            Name = name;
-            _subChapters = new List<SubChapter>();
-        }
+		public Section(string title)
+		{
+			Title = title;
+			_children = new List<IBookElement>();
+		}
 
-        /// <summary>
-        /// Adaugă un subcapitol în capitol
-        /// </summary>
-        public void AddSubChapter(SubChapter subChapter)
-        {
-            _subChapters.Add(subChapter);
-        }
+		public void Print()
+		{
+			Console.WriteLine(Title);
+			foreach (var child in _children)
+			{
+				child.Print();
+			}
+		}
 
-        /// <summary>
-        /// Returnează toate subcapitolele
-        /// </summary>
-        public IReadOnlyList<SubChapter> GetSubChapters()
-        {
-            return _subChapters.AsReadOnly();
-        }
+		public void Add(IBookElement element)
+		{
+			_children.Add(element);
+		}
 
-        public void Print()
-        {
-            Console.WriteLine($"\n========== CAPITOL: {Name} ==========");
-            foreach (var subChapter in _subChapters)
-            {
-                subChapter.Print();
-            }
-            Console.WriteLine($"========== SFÂRȘIT CAPITOL: {Name} ==========\n");
-        }
+		public void Remove(IBookElement element)
+		{
+			_children.Remove(element);
+		}
 
-        public override string ToString()
-        {
-            return $"Capitol: {Name}";
-        }
-    }
+		public IBookElement Get(int index)
+		{
+			return _children[index];
+		}
+
+		public override string ToString()
+		{
+			return $"Section: {Title}";
+		}
+	}
 }
