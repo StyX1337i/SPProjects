@@ -31,7 +31,6 @@ namespace BookModel
 			foreach (var child in _children) child.Print();
 		}
 
-		// Composite methods
 		public void Add(IBookElement element)
 		{
 			_children.Add(element);
@@ -47,7 +46,6 @@ namespace BookModel
 			return _children[index];
 		}
 
-		// Convenience to mirror required API name
 		public void AddContent(IBookElement element)
 		{
 			Add(element);
