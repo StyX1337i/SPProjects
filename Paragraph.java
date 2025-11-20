@@ -1,15 +1,30 @@
 public class Paragraph implements Element {
     private String text;
+    // Referința la interfața Strategy
+    private AlignStrategy alignStrategy; 
 
     public Paragraph(String text) {
         this.text = text;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    // Metoda pentru a schimba strategia (setAlignStrategy)
+    public void setAlignStrategy(AlignStrategy strategy) {
+        this.alignStrategy = strategy;
+    }
+
     @Override
     public void print() {
-        System.out.println("Paragraph: " + text);
+        if (alignStrategy != null) {
+            alignStrategy.render(this, "Default Context"); 
+        } else {
+            System.out.println("Paragraph: " + text);
+        }
     }
-    
+
     @Override
     public void add(Element element) {
         throw new UnsupportedOperationException();
