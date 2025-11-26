@@ -1,8 +1,10 @@
 package ro.uvt.commands;
 
-import ro.uvt.services.BooksService;
+import ro.uvt.persistence.CrudRepository;
+import ro.uvt.models.Book;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class UpdateBookCommand implements Command {
     private final CommandContext context;
@@ -13,10 +15,26 @@ public class UpdateBookCommand implements Command {
 
     @Override
     public Object execute() {
-        BooksService booksService = context.getBooksService();
-        String id = context.getId();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        CrudRepository<Book, Long> booksRepository = context.getBooksRepository();
+        Long id = context.getId();
         Map<String, Object> bookData = (Map<String, Object>) context.getData();
-        return booksService.updateBook(id, bookData);
+        
+        Optional<Book> existingBookOpt = booksRepository.findById(id);
+        if (!existingBookOpt.isPresent()) {
+            return null;
+        }
+        
+        Book existingBook = existingBookOpt.get();
+        String title = (String) bookData.getOrDefault("title", existingBook.getTitle());
+        
+        existingBook.setTitle(title);
+        return booksRepository.save(existingBook);
     }
 }
 

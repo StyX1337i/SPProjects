@@ -1,6 +1,7 @@
 package ro.uvt.commands;
 
-import ro.uvt.services.BooksService;
+import ro.uvt.persistence.CrudRepository;
+import ro.uvt.models.Book;
 
 import java.util.Map;
 
@@ -13,9 +14,30 @@ public class CreateBookCommand implements Command {
 
     @Override
     public Object execute() {
-        BooksService booksService = context.getBooksService();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        String isbn = fetchISBNFromExternalService();
+        CrudRepository<Book, Long> booksRepository = context.getBooksRepository();
         Map<String, Object> bookData = (Map<String, Object>) context.getData();
-        return booksService.createBook(bookData);
+        
+        String title = (String) bookData.getOrDefault("title", "Untitled");
+        Book book = new Book(title, isbn);
+        
+        book = booksRepository.save(book);
+        return book;
+    }
+
+    private String fetchISBNFromExternalService() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return "ISBN-" + System.currentTimeMillis();
     }
 }
 

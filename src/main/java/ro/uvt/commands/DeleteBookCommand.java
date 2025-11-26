@@ -1,6 +1,7 @@
 package ro.uvt.commands;
 
-import ro.uvt.services.BooksService;
+import ro.uvt.persistence.CrudRepository;
+import ro.uvt.models.Book;
 
 public class DeleteBookCommand implements Command {
     private final CommandContext context;
@@ -11,9 +12,13 @@ public class DeleteBookCommand implements Command {
 
     @Override
     public Object execute() {
-        BooksService booksService = context.getBooksService();
-        String id = (String) context.getData();
-        return booksService.deleteBook(id);
+        CrudRepository<Book, Long> booksRepository = context.getBooksRepository();
+        Long id = Long.parseLong((String) context.getData());
+        boolean exists = booksRepository.existsById(id);
+        if (exists) {
+            booksRepository.deleteById(id);
+        }
+        return exists;
     }
 }
 

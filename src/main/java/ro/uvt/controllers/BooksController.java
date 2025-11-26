@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.uvt.commands.*;
-import ro.uvt.services.BooksService;
+import ro.uvt.models.Book;
+import ro.uvt.persistence.CrudRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,18 +16,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/books")
 public class BooksController {
 
-    private final BooksService booksService;
+    private final CrudRepository<Book, Long> booksRepository;
     private final CommandExecutor commandExecutor;
     private final Map<String, RequestStatus> requestStatuses = new ConcurrentHashMap<>();
 
-    public BooksController(BooksService booksService, CommandExecutor commandExecutor) {
-        this.booksService = booksService;
+    public BooksController(CrudRepository<Book, Long> booksRepository, CommandExecutor commandExecutor) {
+        this.booksRepository = booksRepository;
         this.commandExecutor = commandExecutor;
     }
 
     @GetMapping
     public ResponseEntity<?> getBooks() {
-        CommandContext context = new CommandContext(booksService, null);
+        CommandContext context = new CommandContext(booksRepository, null);
         GetBooksCommand command = new GetBooksCommand(context);
         Object result = commandExecutor.execute(command);
         return ResponseEntity.ok(result);
@@ -34,7 +35,7 @@ public class BooksController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBook(@PathVariable String id) {
-        CommandContext context = new CommandContext(booksService, id);
+        CommandContext context = new CommandContext(booksRepository, id);
         GetBookCommand command = new GetBookCommand(context);
         Object result = commandExecutor.execute(command);
         return ResponseEntity.ok(result);
@@ -43,7 +44,7 @@ public class BooksController {
     @PostMapping
     public ResponseEntity<?> createBook(@RequestBody Map<String, Object> bookData) {
         String requestId = UUID.randomUUID().toString();
-        CommandContext context = new CommandContext(booksService, bookData);
+        CommandContext context = new CommandContext(booksRepository, bookData);
         CreateBookCommand command = new CreateBookCommand(context);
         
         requestStatuses.put(requestId, new RequestStatus("PENDING", null));
@@ -59,8 +60,8 @@ public class BooksController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody Map<String, Object> bookData) {
         String requestId = UUID.randomUUID().toString();
-        CommandContext context = new CommandContext(booksService, bookData);
-        context.setId(id);
+        CommandContext context = new CommandContext(booksRepository, bookData);
+        context.setId(Long.parseLong(id));
         UpdateBookCommand command = new UpdateBookCommand(context);
         
         requestStatuses.put(requestId, new RequestStatus("PENDING", null));
@@ -75,7 +76,7 @@ public class BooksController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBook(@PathVariable String id) {
-        CommandContext context = new CommandContext(booksService, id);
+        CommandContext context = new CommandContext(booksRepository, id);
         DeleteBookCommand command = new DeleteBookCommand(context);
         Object result = commandExecutor.execute(command);
         return ResponseEntity.ok(result);

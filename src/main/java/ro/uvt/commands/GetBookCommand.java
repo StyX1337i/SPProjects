@@ -1,6 +1,9 @@
 package ro.uvt.commands;
 
-import ro.uvt.services.BooksService;
+import ro.uvt.persistence.CrudRepository;
+import ro.uvt.models.Book;
+
+import java.util.Optional;
 
 public class GetBookCommand implements Command {
     private final CommandContext context;
@@ -11,9 +14,10 @@ public class GetBookCommand implements Command {
 
     @Override
     public Object execute() {
-        BooksService booksService = context.getBooksService();
-        String id = (String) context.getData();
-        return booksService.getBookById(id);
+        CrudRepository<Book, Long> booksRepository = context.getBooksRepository();
+        Long id = Long.parseLong((String) context.getData());
+        Optional<Book> book = booksRepository.findById(id);
+        return book.orElse(null);
     }
 }
 
