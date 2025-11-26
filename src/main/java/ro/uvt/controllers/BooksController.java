@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.uvt.commands.*;
 import ro.uvt.models.Book;
+import ro.uvt.observer.AllBooksSubject;
 import ro.uvt.persistence.CrudRepository;
 
 import java.util.HashMap;
@@ -18,11 +19,13 @@ public class BooksController {
 
     private final CrudRepository<Book, Long> booksRepository;
     private final CommandExecutor commandExecutor;
+    private final AllBooksSubject allBooksSubject;
     private final Map<String, RequestStatus> requestStatuses = new ConcurrentHashMap<>();
 
-    public BooksController(CrudRepository<Book, Long> booksRepository, CommandExecutor commandExecutor) {
+    public BooksController(CrudRepository<Book, Long> booksRepository, CommandExecutor commandExecutor, AllBooksSubject allBooksSubject) {
         this.booksRepository = booksRepository;
         this.commandExecutor = commandExecutor;
+        this.allBooksSubject = allBooksSubject;
     }
 
     @GetMapping
@@ -45,6 +48,7 @@ public class BooksController {
     public ResponseEntity<?> createBook(@RequestBody Map<String, Object> bookData) {
         String requestId = UUID.randomUUID().toString();
         CommandContext context = new CommandContext(booksRepository, bookData);
+        context.setAllBooksSubject(allBooksSubject);
         CreateBookCommand command = new CreateBookCommand(context);
         
         requestStatuses.put(requestId, new RequestStatus("PENDING", null));

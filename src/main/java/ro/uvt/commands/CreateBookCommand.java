@@ -28,6 +28,12 @@ public class CreateBookCommand implements Command {
         Book book = new Book(title, isbn);
         
         book = booksRepository.save(book);
+        
+        AllBooksSubject allBooksSubject = context.getAllBooksSubject();
+        if (allBooksSubject != null) {
+            allBooksSubject.add(book);
+        }
+        
         return book;
     }
 
